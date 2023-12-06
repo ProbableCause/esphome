@@ -86,7 +86,11 @@ bool HOT IRAM_ATTR DHT::read_sensor_(float *temperature, float *humidity, bool r
   if (this->model_ == DHT_MODEL_DHT11) {
     delayMicroseconds(18000);
   } else if (this->model_ == DHT_MODEL_SI7021) {
-    delayMicroseconds(500);
+    #ifdef USE_ESP8266
+        delayMicroseconds(500);
+    #else
+        delayMicroseconds(400);
+    #endif
     this->pin_->digital_write(true);
     delayMicroseconds(40);
   } else if (this->model_ == DHT_MODEL_DHT22_TYPE2) {
@@ -103,8 +107,12 @@ bool HOT IRAM_ATTR DHT::read_sensor_(float *temperature, float *humidity, bool r
     // Host pull up 20-40us then DHT response 80us
     // Start waiting for initial rising edge at the center when we
     // expect the DHT response (30us+40us)
-    delayMicroseconds(70);
-
+    #ifdef USE_ESP8266
+        delayMicroseconds(70);
+    #else
+        delayMicroseconds(30);
+    #endif
+    
     uint8_t bit = 7;
     uint8_t byte = 0;
 
